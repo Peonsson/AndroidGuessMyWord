@@ -27,13 +27,13 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-         textInput = (EditText) findViewById(R.id.editText);
-         textOutput = (TextView) findViewById(R.id.textView);
-         stopWatch = (Chronometer) findViewById(R.id.chronometer);
-         newGameButton = (Button) findViewById(R.id.button);
-         newGameButton.setOnClickListener(new NewGameClickListener());
-         submitButton = (Button) findViewById(R.id.button2);
-         submitButton.setOnClickListener(new SubmitClickListener());
+        textInput = (EditText) findViewById(R.id.editText);
+        textOutput = (TextView) findViewById(R.id.textView);
+        stopWatch = (Chronometer) findViewById(R.id.chronometer);
+        newGameButton = (Button) findViewById(R.id.button);
+        newGameButton.setOnClickListener(new NewGameClickListener());
+        submitButton = (Button) findViewById(R.id.button2);
+        submitButton.setOnClickListener(new SubmitClickListener());
 
         guessModel = new GuessMyWordModel();
     }
@@ -42,9 +42,20 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onClick(View v) {
             String input = textInput.getText().toString();
-            if(input.length() > 0) {
+            if (input.length() > 0) {
                 char guess = input.charAt(0);
-                textOutput.setText("The character: " + guess);
+                guessModel.handleGuess(guess);
+
+                int n = guessModel.getNoOfGuesses();
+                String soFar = guessModel.getGuessSoFar();
+                textOutput.setText(soFar + ", guesses = " + n);
+                textInput.selectAll();
+
+                if (guessModel.isSolved()) {
+                    showToast("You are victorious!");
+                    stopWatch.stop();
+                }
+
             } else {
                 showToast("Please enter a letter!");
             }
@@ -54,7 +65,11 @@ public class MainActivity extends ActionBarActivity {
     private class NewGameClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            // To do...
+            guessModel.reset();
+            String soFar = guessModel.getGuessSoFar();
+            textOutput.setText("The word: " + soFar);
+            stopWatch.setBase(SystemClock.elapsedRealtime());
+            stopWatch.start();
         }
     }
 
